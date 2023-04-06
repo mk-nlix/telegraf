@@ -284,7 +284,7 @@ func (a *Elasticsearch) Write(metrics []telegraf.Metric) error {
 		m["tag"] = metric.Tags()
 		m[name] = fields
 
-		br := elastic.NewBulkIndexRequest().Index(indexName).Doc(m)
+		br := elastic.NewBulkIndexRequest().OpType("create").Index(indexName).Doc(m)
 
 		if a.ForceDocumentID {
 			id := GetPointID(metric)
