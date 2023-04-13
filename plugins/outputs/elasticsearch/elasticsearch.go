@@ -46,6 +46,7 @@ type Elasticsearch struct {
 	Timeout             config.Duration `toml:"timeout"`
 	URLs                []string        `toml:"urls"`
 	UsePipeline         string          `toml:"use_pipeline"`
+	OpType              string          `toml:"op_type"`
 	Log                 telegraf.Logger `toml:"-"`
 	majorReleaseNumber  int
 	pipelineName        string
@@ -210,7 +211,7 @@ func (a *Elasticsearch) Connect() error {
 
 	// quit if ES version is not supported
 	majorReleaseNumber, err := strconv.Atoi(strings.Split(esVersion, ".")[0])
-	if err != nil || majorReleaseNumber < 5 {
+	if err != nil || majorReleaseNumber < 7 {
 		return fmt.Errorf("elasticsearch version not supported: %s", esVersion)
 	}
 
@@ -284,7 +285,11 @@ func (a *Elasticsearch) Write(metrics []telegraf.Metric) error {
 		m["tag"] = metric.Tags()
 		m[name] = fields
 
-		br := elastic.NewBulkIndexRequest().OpType("create").Index(indexName).Doc(m)
+		br := elastic.NewBulkIndexRequest().Index(indexName).Doc(m)
+
+		if a.OpType == "create" {
+			br = elastic.NewBulkIndexRequest().OpType("create").Index(indexName).Doc(m)
+		}
 
 		if a.ForceDocumentID {
 			id := GetPointID(metric)

@@ -284,6 +284,9 @@ to use them.
   ## the default tag value will be used.
   # index_name = "telegraf-{{host}}-%Y.%m.%d"
   # default_tag_value = "none"
+  ## Set operation type for adding new documents requests to target:
+  ## "index" (default) or "create", which is required for data streams.
+  # op_type = "index"
   index_name = "telegraf-%Y.%m.%d" # required.
 
   ## Optional TLS Config
